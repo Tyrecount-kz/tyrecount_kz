@@ -1,0 +1,99 @@
+CREATE TABLE users(
+    user_id number(10) NOT NULL PRIMARY KEY,
+    first_name varchar2(150),
+    last_name varchar2(150),
+    phone varchar2(20),
+    email varchar2(150),
+    password varchar2(150)
+);
+
+CREATE TABLE log_reports(
+    log_id number(10) NOT NULL PRIMARY KEY,
+    user_id number(10) DEFAULT 1,
+    FOREIGN KEY(user_id) REFERENCES users(user_id),
+    log_date DATE,
+    event varchar2(250)
+);
+
+CREATE TABLE queries(
+    query_id number(10) NOT NULL PRIMARY KEY,
+    car_model varchar2(100),
+    release_year varchar2(15),
+    shell varchar2(35),
+    mileage number(30),
+    transmission varchar2(35),
+    rudder varchar2(26),
+    color varchar2(45),
+    gear varchar2(45),
+    custom_clear varchar2(26),
+    price varchar2(40),
+    engine_volume varchar2(35),
+    created_date date
+)
+
+CREATE TABLE cars (
+    car_id number(10) NOT NULL PRIMARY KEY,
+    user_id number(10) DEFAULT 1,
+    query_id number(10),
+    city varchar2(150),
+    in_market NUMBER(1,0),
+    FOREIGN KEY(user_id) REFERENCES users(user_id),
+    FOREIGN KEY(query_id) REFERENCES queries(query_id)
+)
+
+
+CREATE TABLE inMarket(
+    post_id number(10) NOT NULL PRIMARY KEY,
+    car_id number(10) DEFAULT 1,
+    post_name varchar2(100) NOT NULL,
+    post_description varchar2(500),
+    user_id number(10),
+    views number(30),
+    added_to_wishlist number(10),
+    created_date DATE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (car_id) REFERENCES cars(car_id)
+)
+
+CREATE TABLE wishlist(
+    user_id number(10) DEFAULT 1,
+    post_id number(10) NOT NULL,
+    created_date date,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (post_id) REFERENCES inMarket(post_id)
+)
+
+CREATE TABLE comments(
+    comment_id number(10) NOT NULL PRIMARY KEY,
+    post_id number(10),
+    user_id number(10) DEFAULT 1,
+    comments_content varchar(500),
+    is_read NUMBER(1,0),
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (post_id) REFERENCES inMarket(post_id)
+)
+
+CREATE TABLE replies(
+    reply_id number(10) NOT NULL PRIMARY KEY,
+    comment_id number(10), 
+    user_id number(10) DEFAULT 1,
+    comment_content varchar2(500),
+    is_read NUMBER(1,0),
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (comment_id) REFERENCES comments(comment_id)
+)
+
+CREATE TABLE prediction_feedback(
+    user_id number(10) DEFAULT 1,
+    post_id number(10) NOT NULL ,
+    created_date date,
+    rate_of_prediction number(10),
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (post_id) REFERENCES inMarket(post_id)
+)
+
+CREATE TABLE photos(
+    post_id number(10) NOT NULL,
+    image BLOB,
+    FOREIGN KEY (post_id) REFERENCES inMarket(post_id)
+)

@@ -1,0 +1,59 @@
+CREATE OR REPLACE PACKAGE carDetail AS
+	TYPE carInfo IS RECORD(
+        city cars.city%type,
+	year cars.year%type,
+	shell cars.shell%type,
+	volume cars.volume%type,
+	mileage	cars.mileage%type,
+	transmission cars.transmission%type,
+	rudder cars.rudder%type,
+	color cars.color%type,
+	gear cars.gear%type,
+	customscleared cars.customscleared%type,
+	typeengine cars.typeengine%type,
+	price cars.price%type,
+	company cars.company%type,
+	model cars.model%type,
+	user_id cars.user_id%type,
+	in_market cars.in_market%type,
+	car_id cars.car_id%type
+    	);
+    	TYPE carInfoList IS table of carInfo;
+	PROCEDURE getCarDetail(p_car_id number, p_post_id number , p_carInfo OUT carInfoList);
+	PROCEDURE addToWishList(p_user_id number, p_post_id number);
+	PROCEDURE addComment(p_post_id IN OUT number,p_user_id number,p_content varchar2, p_owner_id IN OUT number);
+	PROCEDURE addReply(p_comment_id number, p_user_id number, p_content varchar2, p_owner_id IN OUT number,p_post_id OUT number);
+	PROCEDURE getPhoto(p_post_id number, p_image IN OUT varchar2);
+end package carDetail;
+
+CREATE OR REPLACE PACKAGE BODY carDetail AS
+	PROCEDURE getCarDetail(p_car_id number, p_post_id number , p_carInfo OUT carInfoList) AS
+		BEGIN
+			select city,year,shell,volume,mileage,transmission,rudder,color,gear,customscleared,typeengine,price,company,model,user_id,in_market,car_id bulk collect into p_carInfo from cars where car_id = p_car_id and post_id = p_post_id;
+		END;
+	PROCEDURE addToWishList(p_user_id number, p_post_id number) AS
+            BEGIN
+                INSERT INTO wishList(user_id,post_id,created_date) values(p_user_id, p_post_id, sysdate);
+                COMMIT;
+            END;
+	PROCEDURE addComment(p_post_id IN OUT number,p_user_id number,p_content varchar2, p_owner_id IN OUT number) AS
+    		BEGIN
+        		INSERT INTO COMMENTS(COMMENT_ID,POST_ID,USER_ID,COMMENTS_CONTENT,IS_READ,CREATED_DATE) 
+        		VALUES(1,p_post_id, p_user_id, p_content, 0, sysdate);
+        		SELECT user_id INTO p_owner_id FROM inMarket WHERE post_id = p_post_id;
+    		END;
+	PROCEDURE addReply(p_comment_id number, p_user_id number, p_content varchar2, p_owner_id IN OUT number,p_post_id OUT number) AS
+    		BEGIN
+        		INSERT INTO REPLIES(REPLY_ID,COMMENT_ID,USER_ID,COMMENT_CONTENT,IS_READ,CREATED_DATE) 
+        		VALUES(1,p_comment_id, p_user_id, p_content, 0,sysdate);
+        		select post_id into p_post_id from comments where comment_id = p_comment_id; 
+        		SELECT user_id INTO p_owner_id FROM inMarket WHERE post_id = p_post_id;
+    		END;
+	PROCEDURE getPhoto(p_post_id number, p_image OUT varchar2) AS
+		BEGIN
+			SELECT image into p_image from photos where post_id = p_post_id;
+		END; 
+	end carDetail;
+
+--'declare carInfo carDetail.carInfoList;begin carDetail.getCarDetail(1,1, p_carInfo); :b := carInfo(1).model;end;'
+

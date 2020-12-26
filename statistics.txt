@@ -1,0 +1,64 @@
+ALTER
+
+
+
+
+
+
+-- Overall Statistics
+set SERVEROUTPUT ON;
+
+
+CREATE OR REPLACE PACKAGE overallStatistics AS
+    FUNCTION carsCountUser(p_user_id number) RETURN NUMBER;
+    PROCEDURE theMostRelelantCars(p_user_id number, showCount number DEFAULT 5);
+end overallStatistics;
+
+CREATE OR REPLACE PACKAGE BODY overallStatistics AS 
+    FUNCTION carsCountUser(p_user_id number) RETURN NUMBER AS
+        v_count number;
+        BEGIN
+            select count(post_id) into v_count from inMarket where user_id = p_user_id;
+            return v_count;
+        END;
+    PROCEDURE theMostRelelantCars(p_user_id number, showCount number DEFAULT 5) AS
+        pl_block varchar(500);
+        BEGIN
+            --pl_block := 'SELECT * FROM inMarket where user_id = '|| p_user_id || ' and rownum < ' || showCount || ' ORDER BY views DESC';
+            pl_block := 'SELECT * FROM users WHERE user_id = 1';
+            dbms_output.put_line(pl_block);
+            execute SELECT * FROM users WHERE user_id = 1;
+        END;
+        
+end overallStatistics;
+/
+-- TEST
+
+BEGIN
+    -- DBMS_OUTPUT.put_line(overallStatistics.carsCountUser(1));
+    overallStatistics.theMostRelelantCars(1,1);
+END;
+describe users;
+INSERT ALL
+    INTO users(user_id, first_name,last_name, phone, email, password) values(2,'John','Karkl','6644','test','admin')
+    INTO users(user_id, first_name,last_name, phone, email, password) values(3,'John1','Karkl1','6644','test','admin')
+    INTO users(user_id, first_name,last_name, phone, email, password) values(4,'John2','Karkl2','6644','test','admin')
+    INTO users(user_id, first_name,last_name, phone, email, password) values(5,'John3','Karkl3','6644','test','admin')
+    INTO users(user_id, first_name,last_name, phone, email, password) values(6,'John4','Karkl4','6644','test','admin')
+    INTO users(user_id, first_name,last_name, phone, email, password) values(7,'Joh5','Karkl5','6644','test','admin')
+    INTO users(user_id, first_name,last_name, phone, email, password) values(8,'John6','Karkl6','6644','test','admin')
+    INTO users(user_id, first_name,last_name, phone, email, password) values(9,'John7','Karkl7','6644','test','admin')
+    INTO users(user_id, first_name,last_name, phone, email, password) values(10,'John8','Kark8l','6644','test','admin')
+select * from dual;
+declare 
+c_id users.user_id%type;
+CURSOR test_cursor IS select user_id from users;
+BEGIN
+    OPEN test_cursor;
+    loop
+    fetch test_cursor into c_id;
+    exit when test_cursor%notfound;
+    select c_id from dual;
+    end loop;
+    close test_cursor;
+END;

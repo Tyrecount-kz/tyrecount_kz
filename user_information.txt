@@ -1,0 +1,92 @@
+-- Profile page
+SET SERVEROUTPUT ON;
+/*
+    FUNCTION IN PACKAGE INVOKED WITH THE NEXT SYNTAX
+    package_name.[function/procedure]_name(parameters);
+*/
+
+describe users;
+CREATE OR REPLACE PACKAGE information1 AS 
+
+    TYPE userInfo IS RECORD(
+        first_name users.first_name%type,
+        last_name users.last_name%type,
+        phone users.phone%type,
+        email users.email%type
+    );
+    TYPE userInfoList IS table of userInfo;
+    PROCEDURE getUserInfo(p_user_id number,p_userInfo OUT userInfoList);
+    FUNCTION isUserOnHisPage(p_user_id number, p_post_id number) RETURN number;
+    PROCEDURE updateUser(p_user_id number, p_first_name varchar2,p_last_name varchar2, p_phone varchar2, p_email varchar2, p_password varchar2);
+    PROCEDURE updateUserFirst(p_user_id number, p_first_name varchar2);
+    PROCEDURE updateUserLast(p_user_id number, p_last_name varchar2);
+    PROCEDURE updateUserPhone(p_user_id number, p_phone varchar2);
+    PROCEDURE updateUserEmail(p_user_id number, p_email varchar2);
+    PROCEDURE updateUserPassword(p_user_id number, p_first_name varchar2);
+END information1;
+
+describe users;
+
+
+CREATE OR REPLACE PACKAGE BODY information1 AS
+    PROCEDURE getUserInfo(p_user_id number,p_userInfo OUT userInfoList) IS
+        BEGIN
+            select first_name,last_name, phone, email bulk collect into p_userInfo from users where user_id = p_user_id;
+        END;
+    FUNCTION isUserOnHisPage(p_user_id number, p_post_id number) RETURN number AS
+        v_user_id users.user_id%type;
+        BEGIN
+            select user_id into v_user_id from inMarket where post_id = p_post_id;
+            IF p_user_id = v_user_id THEN
+                return 1;
+            ELSIF p_user_id != v_user_id THEN
+                return 0;
+            ELSE
+                DBMS_OUTPUT.put_line('Error');
+                return -1;
+            END IF;
+        END;
+    -- First Name/Last Name/Phone/EMail/Password 
+    PROCEDURE updateUser(p_user_id number, p_first_name varchar2,p_last_name varchar2, p_phone varchar2, p_email varchar2, p_password varchar2) AS
+        BEGIN
+            UPDATE users SET first_name = p_first_name, last_name = p_last_name, phone = p_phone, email = p_email, password = p_password where user_id = p_user_id;
+            COMMIT;
+        END;
+    PROCEDURE updateUserFirst(p_user_id number, p_first_name varchar2) AS
+        BEGIN
+            UPDATE users SET first_name = p_first_name where user_id = p_user_id;
+            COMMIT;
+        END;
+    PROCEDURE updateUserLast(p_user_id number, p_last_name varchar2) AS
+        BEGIN
+            UPDATE users SET last_name = p_last_name where user_id = p_user_id;
+            COMMIT;
+        END;
+    PROCEDURE updateUserPhone(p_user_id number, p_phone varchar2) AS
+        BEGIN
+            UPDATE users SET phone = p_phone where user_id = p_user_id;
+            COMMIT;
+        END;
+    PROCEDURE updateUserEmail(p_user_id number, p_email varchar2) AS
+        BEGIN
+            UPDATE users SET email = p_email where user_id = p_user_id;
+            COMMIT;
+        END;
+    PROCEDURE updateUserPassword(p_user_id number, p_first_name varchar2) AS
+        BEGIN
+            UPDATE users SET first_name = p_first_name where user_id = p_user_id;
+            COMMIT;
+        END;
+end information1;
+/
+
+/*
+declare 
+    userInfo information1.userInfoList;
+    u_phone users.phone%type;
+BEGIN 
+    information1.getuserinfo(1,userInfo);
+    DBMS_OUTPUT.PUT_LINE(userInfo(1).name);
+END;
+/
+*/

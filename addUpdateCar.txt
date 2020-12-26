@@ -1,0 +1,44 @@
+create or replace package carUpdateInsertPackage as
+    PROCEDURE CarUpdateInsert(p_city varchar2,p_name varchar2,p_year number, 
+    p_shell varchar2, p_mileage number, p_transmission varchar2, 
+    p_rudder varchar2, p_color varchar2, p_gear varchar2, p_c_clear varchar2, 
+    p_typeengine varchar2, p_price number, p_volume FLOAT,p_inMarket number,
+    p_car_id number,p_used_id number);
+    
+end carUpdateInsertPackage;
+
+CREATE OR REPLACE PACKAGE BODY carUpdateInsertPackage AS
+    PROCEDURE CarUpdateInsert(p_city varchar2,p_name varchar2,p_year number, 
+    p_shell varchar2, p_mileage number, p_transmission varchar2, 
+    p_rudder varchar2, p_color varchar2, p_gear varchar2, p_c_clear varchar2, 
+    p_typeengine varchar2, p_price number, p_volume FLOAT,p_inMarket number,
+    p_car_id number,p_user_id = user_id number) as
+    BEGIN
+        IF(select car_id,user_id from Cars where car_id=p_car_id 
+            and p_user_id = user_id) THEN
+            UPDATE INTO Cars(city,name,year, 
+            shell, mileage, transmission, 
+            rudder, color, gear, customscleared, 
+            typeengine, price, volume, in_market, created_date) 
+            values
+            (p_city,p_name,
+            p_year, p_shell, p_mileage, p_transmission, 
+            p_rudder, p_color, p_gear, p_c_clear, 
+            p_typeengine, p_price, p_volume ,p_inMarket,sysdate);
+            COMMIT;
+        ELSE
+            INSERT INTO Cars(city,name,year, 
+            shell, mileage, transmission, 
+            rudder, color, gear, customscleared, 
+            typeengine, price, volume, in_market,
+            car_id ,user_id, created_date) 
+            values
+            (p_city varchar2,p_name varchar2,
+            p_year number, p_shell varchar2, p_mileage number, p_transmission varchar2, 
+            p_rudder varchar2, p_color varchar2, p_gear varchar2, p_c_clear varchar2, 
+            p_typeengine varchar2, p_price number, p_volume FLOAT,p_inMarket number,
+            p_car_id number,p_used_id number,sysdate);
+            COMMIT;
+        END IF;
+    END;
+end carUpdateInsertPackage;

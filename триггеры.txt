@@ -1,0 +1,69 @@
+CREATE SEQUENCE query_id_seq;
+    
+CREATE SEQUENCE post_id_seq;
+
+CREATE SEQUENCE reply_id_seq;
+
+CREATE SEQUENCE comment_id_seq;
+
+CREATE SEQUENCE log_id_seq;
+
+CREATE SEQUENCE user_id_seq;
+
+CREATE OR REPLACE TRIGGER updatePostId
+    BEFORE INSERT 
+    ON inMarket
+    FOR EACH ROW
+        
+    BEGIN 
+        SELECT post_id_seq.NEXTVAL
+        INTO :new.post_id
+        from dual;
+    END;
+
+CREATE OR REPLACE TRIGGER updateCommentId
+    BEFORE INSERT 
+    ON comments
+    FOR EACH ROW
+        
+    BEGIN 
+        SELECT comment_id_seq.NEXTVAL
+        INTO :new.comment_id
+        from dual;
+    END;
+
+
+CREATE OR REPLACE TRIGGER updateLogId
+    BEFORE INSERT 
+    ON log_reports
+    FOR EACH ROW
+        
+    BEGIN 
+        SELECT log_id_seq.NEXTVAL
+        INTO :new.log_id
+        from dual;
+    END;
+
+CREATE OR REPLACE TRIGGER updateReplyId
+    BEFORE INSERT 
+    ON replies
+    FOR EACH ROW
+        
+    BEGIN 
+        SELECT reply_id_seq.NEXTVAL
+        INTO :new.reply_id
+        from dual;
+    END;
+
+CREATE OR REPLACE TRIGGER updateUserId
+    BEFORE INSERT 
+    ON users
+    FOR EACH ROW
+        
+    BEGIN 
+        SELECT user_id_seq.NEXTVAL
+        INTO :new.user_id
+        from dual;
+    END;
+
+
